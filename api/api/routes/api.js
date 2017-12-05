@@ -8,9 +8,10 @@ module.exports = (app) => {
       mongoClient.collection('posts', (err, collection) => {
         collection.find().toArray((err, results) => {
           if (err) {
-            res.json(err);
+            res.status(500).json(err);
           } else {
-            res.json(results);
+            let status = (results.length > 0) ? 200 : 204;
+            res.status(status).json(results);
           }
         });
       });
@@ -25,9 +26,10 @@ module.exports = (app) => {
       mongoClient.collection('posts', (err, collection) => {
         collection.find(objectId(req.params.id)).toArray((err, results) => {
           if (err) {
-            res.json(err);
+            res.status(500).json(err);
           } else {
-            res.json(results);
+            let status = (results.length > 0) ? 200 : 204;
+            res.status(status).json(results);
           }
         });
       });
@@ -44,9 +46,10 @@ module.exports = (app) => {
       mongoClient.collection('posts', (err, collection) => {
         collection.insert(formData, (err, results) => {
           if (err) {
-            res.json(err);
+            res.status(500).json(err);
           } else {
-            res.json(results.ops);
+            let status = (results.length > 0) ? 201 : 400;
+            res.status(status).json(results);
           }
         });
       });
@@ -65,9 +68,9 @@ module.exports = (app) => {
           {},
           (err, results) => {
             if (err) {
-              res.json(err);
+              res.status(500).json(err);
             } else {
-              res.json(results);
+              res.status(200).json(results);
             }
           }
         );
@@ -83,9 +86,10 @@ module.exports = (app) => {
       mongoClient.collection('posts', (err, collection) => {
         collection.remove({ _id : objectId(req.params.id)}, (err, results) => {
             if (err) {
-              res.json(err);
+              res.status(500).json(err);
             } else {
-              res.json(results);
+              let status = (results.length > 0) ? 200 : 204;
+              res.status(status).json(results);
             }
           }
         );
