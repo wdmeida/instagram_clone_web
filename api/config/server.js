@@ -1,14 +1,15 @@
 const express = require('express');
+const consign = require('consign');
 const bodyParser = require('body-parser');
-const mongodb = require('mongodb');
 
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-const PORT = 3000;
+consign()
+  .include('api/routes')
+  .then('config/dbConnection.js')
+  .into(app);
 
-app.listen(PORT);
-
-console.log('Server listen in port ' + PORT);
+module.exports = app;
