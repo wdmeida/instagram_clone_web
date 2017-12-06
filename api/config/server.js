@@ -1,15 +1,19 @@
 const express = require('express');
 const consign = require('consign');
 const bodyParser = require('body-parser');
+const multiparty = require('connect-multiparty');
+const allowCors = require('./cors');
 
-const app = express();
+const api = express();
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+api.use(bodyParser.urlencoded({ extended: true }));
+api.use(bodyParser.json());
+api.use(multiparty());
+api.use(allowCors);
 
 consign()
   .include('api/routes')
   .then('config/dbConnection.js')
-  .into(app);
+  .into(api);
 
-module.exports = app;
+module.exports = api;
