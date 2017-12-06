@@ -17,6 +17,32 @@
 		<script>
 			$(document).ready(function(){
 
+				function carrega_postagens() {
+					var xmlHttpRequest = new XMLHttpRequest();
+					xmlHttpRequest.open('GET', 'http://localhost:3000/posts');
+
+					xmlHttpRequest.onload = function() {
+						if (xmlHttpRequest.status === 200) {
+							var data = $.parseJSON(xmlHttpRequest.responseText);
+							
+							for (i = 0; i < data.length; i++) {
+								$('#container_timeline').append(
+								'<div class="publicacao">' +
+									'<span class="titulo">'	+ 
+										data[i].titulo + 
+									'</span>' +
+									'<img src="http://localhost:3000/uploads/' + data[i].url_imagem + '" />' +
+								'</div>'
+								);
+							}
+						}
+					}
+
+					xmlHttpRequest.send();
+				}
+
+				carrega_postagens();
+
 				$('#btn_incluir').click(function(){
 					$('#container_timeline').hide();
 					$('#container_form').show();
