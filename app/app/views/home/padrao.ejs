@@ -27,14 +27,49 @@
 							
 							for (i = 0; i < data.length; i++) {
 								$('#container_timeline').append(
-								'<div class="publicacao">' +
-									'<span class="titulo">'	+ 
-										data[i].titulo + 
-									'</span>' +
-									'<img src="http://localhost:3000/uploads/' + data[i].url_imagem + '" />' +
-								'</div>'
+									'<div class="publicacao">' +
+										'<span class="titulo">'	+ 
+											data[i].titulo + 
+										'</span>' +
+										'<img src="http://localhost:3000/imagens/' + data[i].url_imagem + '" />' +
+										'<div class="comentarios" id="comentarios_' + data[i]._id + '"></div>' +
+										'<div class="comentar">' +
+											'<input type="text" class="form-control input_comentario" id="postagem_' + data[i]._id +'" placeholder="Adiciona um comentário" />' +
+											'<button class="btn btn-default btn_postagem" value="' + data[i]._id +'" type="button">Comentar</button>' +
+										'</div>' +
+									'</div>'
 								);
+
+								if (data[i].comentarios !== undefined) {
+									var comentarios = data[i].comentarios;
+
+									for (j = 0; j < comentarios.length; j++) {
+										$(`#comentarios_${data[i]._id}`).append(
+											'<div class="txt_comentario">' +
+												comentarios[j].comentario +	
+											'</div>'
+										);
+									}
+								}
 							}
+
+							$('.btn_postagem').click(function() {
+								var id = this.value;
+								var id_input_comentario = 'postagem_' + id;
+								var comentario = $('#' + id_input_comentario).val();
+
+								var xmlHttpRequest = new XMLHttpRequest();
+								xmlHttpRequest.open('PUT', `http://localhost:3000/posts/${id}`);
+								xmlHttpRequest.setRequestHeader('Content-Type', 'application/json');
+								
+								xmlHttpRequest.onload = function() {
+									if (xmlHttpRequest.status === 200) {
+										window.location.href = '/home';
+									}
+								}
+
+								xmlHttpRequest.send(JSON.stringify({comentario}));
+							});
 						}
 					}
 

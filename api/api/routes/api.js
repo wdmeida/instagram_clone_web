@@ -1,10 +1,10 @@
 const objectId = require('mongodb').ObjectId;
 const fs = require('fs');
 
-module.exports = (app) => {
+module.exports = (api) => {
   
-  app.get('/posts', (req, res) => {
-    const connection = app.config.dbConnection();
+  api.get('/posts', (req, res) => {
+    const connection = api.config.dbConnection();
     connection.open((err, mongoClient) => {
       mongoClient.collection('posts', (err, collection) => {
         collection.find().toArray((err, results) => {
@@ -21,8 +21,8 @@ module.exports = (app) => {
     });
   });
 
-  app.get('/posts/:id', (req, res) => {
-    const connection = app.config.dbConnection();
+  api.get('/posts/:id', (req, res) => {
+    const connection = api.config.dbConnection();
     connection.open((err, mongoClient) => {
       mongoClient.collection('posts', (err, collection) => {
         collection.find(objectId(req.params.id)).toArray((err, results) => {
@@ -39,7 +39,7 @@ module.exports = (app) => {
     });
   });
 
-  app.post('/posts', (req, res) => {
+  api.post('/posts', (req, res) => {
     const date = new Date();
     const time_stamp = date.getTime();
 
@@ -57,7 +57,7 @@ module.exports = (app) => {
 
     const data = { url_imagem, titulo: req.body.titulo }
 
-    const connection = app.config.dbConnection();
+    const connection = api.config.dbConnection();
     connection.open((err, mongoClient) => {
       mongoClient.collection('posts', (err, collection) => {
         collection.insert(data, (err, results) => {
@@ -74,13 +74,16 @@ module.exports = (app) => {
     });
   });
 
-  app.put('/posts/:id', (req, res) => {
-    const connection = app.config.dbConnection();
+  api.put('/posts/:id', (req, res) => {
+    const connection = api.config.dbConnection();
     connection.open((err, mongoClient) => {
       mongoClient.collection('posts', (err, collection) => {
         collection.update(
           { _id : objectId(req.params.id) },
-          { $set : { titulo : req.body.titulo } },
+          { $push : { comentarios: {
+            id_comentario: new objectId(),
+            comentario : req.body.comentario
+          } } },
           {},
           (err, results) => {
             if (err) {
@@ -96,8 +99,8 @@ module.exports = (app) => {
     });
   });
 
-  app.delete('/posts/:id', (req, res) => {
-    const connection = app.config.dbConnection();
+  api.delete('/posts/:id', (req, res) => {
+    const connection = api.config.dbConnection();
     connection.open((err, mongoClient) => {
       mongoClient.collection('posts', (err, collection) => {
         collection.remove({ _id : objectId(req.params.id)}, (err, results) => {
