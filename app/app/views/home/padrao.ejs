@@ -17,6 +17,83 @@
 		<script>
 			$(document).ready(function(){
 
+				function carrega_postagens() {
+					var xmlHttpRequest = new XMLHttpRequest();
+					xmlHttpRequest.open('GET', 'http://localhost:3000/posts');
+
+					xmlHttpRequest.onload = function() {
+						if (xmlHttpRequest.status === 200) {
+							var data = $.parseJSON(xmlHttpRequest.responseText);
+							
+							for (i = 0; i < data.length; i++) {
+								$('#container_timeline').append(
+									'<div class="publicacao">' +
+										'<span class="titulo">'	+ 
+											data[i].titulo + 
+										'</span>' +
+										'<img src="http://localhost:3000/imagens/' + data[i].url_imagem + '" />' +
+										'<div class="comentarios" id="comentarios_' + data[i]._id + '"></div>' +
+										'<div class="comentar">' +
+											'<input type="text" class="form-control input_comentario" id="postagem_' + data[i]._id +'" placeholder="Adiciona um comentário" />' +
+											'<button class="btn btn-default btn_postagem" value="' + data[i]._id +'" type="button">Comentar</button>' +
+										'</div>' +
+									'</div>'
+								);
+
+								if (data[i].comentarios !== undefined) {
+									var comentarios = data[i].comentarios;
+
+									for (j = 0; j < comentarios.length; j++) {
+										$(`#comentarios_${data[i]._id}`).append(
+											'<div class="txt_comentario">' +
+												'<button type="button" value="' + comentarios[j].id_comentario + '" class="btn btn-default btn_remover_postagem">X</button>' +
+												comentarios[j].comentario +	
+											'</div>'
+										);
+									}
+								}
+							}
+
+							$('.btn_remover_postagem').click(function() {
+								var id_comentario = this.value;
+						
+								var xmlHttpRequest = new XMLHttpRequest();
+								xmlHttpRequest.open('DELETE', `http://localhost:3000/posts/${id_comentario}`);
+
+								xmlHttpRequest.onload = function() {
+									if (xmlHttpRequest === 200) {
+										window.location.href = '/home';
+									}
+								}
+
+								xmlHttpRequest.send();
+							});
+
+							$('.btn_postagem').click(function() {
+								var id = this.value;
+								var id_input_comentario = 'postagem_' + id;
+								var comentario = $('#' + id_input_comentario).val();
+
+								var xmlHttpRequest = new XMLHttpRequest();
+								xmlHttpRequest.open('PUT', `http://localhost:3000/posts/${id}`);
+								xmlHttpRequest.setRequestHeader('Content-Type', 'application/json');
+								
+								xmlHttpRequest.onload = function() {
+									if (xmlHttpRequest.status === 200) {
+										window.location.href = '/home';
+									}
+								}
+
+								xmlHttpRequest.send(JSON.stringify({comentario}));
+							});
+						}
+					}
+
+					xmlHttpRequest.send();
+				}
+
+				carrega_postagens();
+
 				$('#btn_incluir').click(function(){
 					$('#container_timeline').hide();
 					$('#container_form').show();
@@ -26,6 +103,29 @@
 					$('#container_timeline').show();
 					$('#container_form').hide();
 					return false;
+				});
+
+				$('#btn-publicar').click(function() {
+					
+					var formData = new FormData();
+
+					var arquivo = document.getElementById('arquivo').files[0];
+					var titulo = document.getElementById('titulo').value;
+
+					formData.append('arquivo', arquivo);
+					formData.append('titulo', titulo);
+
+					var xmlHttpRequest = new XMLHttpRequest();
+
+					xmlHttpRequest.onreadystatechange = function() {
+						if (xmlHttpRequest.readyState === 4) {
+							var response = xmlHttpRequest.responseText;
+							document.getElementById('mensagem').innerHTML = response;
+						}
+					}
+
+					xmlHttpRequest.open('POST', 'http://localhost:3000/posts');
+					xmlHttpRequest.send(formData);
 				});
 
 			});
