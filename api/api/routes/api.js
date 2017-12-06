@@ -80,10 +80,13 @@ module.exports = (api) => {
       mongoClient.collection('posts', (err, collection) => {
         collection.update(
           { _id : objectId(req.params.id) },
-          { $push : { comentarios: {
-            id_comentario: new objectId(),
-            comentario : req.body.comentario
-          } } },
+          { $push : 
+            { comentarios: {
+                id_comentario: new objectId(),
+                comentario : req.body.comentario
+              } 
+            } 
+          },
           {},
           (err, results) => {
             if (err) {
@@ -103,7 +106,17 @@ module.exports = (api) => {
     const connection = api.config.dbConnection();
     connection.open((err, mongoClient) => {
       mongoClient.collection('posts', (err, collection) => {
-        collection.remove({ _id : objectId(req.params.id)}, (err, results) => {
+        collection.update(
+          {},
+          {
+            $pull: {
+              comentarios: {
+                id_comentario: objectId(req.params.id)
+              }
+            }
+          },
+          { multi: true },
+          (err, results) => {
             if (err) {
               res.status(500).json(err);
             } else {
