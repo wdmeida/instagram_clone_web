@@ -1,4 +1,5 @@
 const objectId = require('mongodb').ObjectId;
+const fs = require('fs');
 
 module.exports = (app) => {
   
@@ -39,17 +40,32 @@ module.exports = (app) => {
   });
 
   app.post('/posts', (req, res) => {
-    const formData = req.body;
+    const date = new Date();
+    const time_stamp = date.getTime();
+
+    const url_imagem = time_stamp + '_' + req.files.arquivo.originalFilename;    
+
+    const initial_path = req.files.arquivo.path;
+    const end_path = './uploads/' + url_imagem;
+
+    fs.rename(initial_path, end_path, err => {
+      if (err) {
+        res.status(500).json({error: err});
+        return;
+      }
+    });
+
+    const data = { url_imagem, titulo: req.body.titulo }
 
     const connection = app.config.dbConnection();
     connection.open((err, mongoClient) => {
       mongoClient.collection('posts', (err, collection) => {
-        collection.insert(formData, (err, results) => {
+        collection.insert(data, (err, results) => {
           if (err) {
-            res.status(500).json(err);
+            res.status(500).json({msg: 'Ocorreu um erro na publicação, por favor tente outra vez!'});
           } else {
-            let status = (results.length > 0) ? 201 : 400;
-            res.status(status).json(results);
+            console.log(results);
+            res.status(201).json({msg: 'Inclusão realizada com sucesso!'});
           }
         });
       });
@@ -64,7 +80,7 @@ module.exports = (app) => {
       mongoClient.collection('posts', (err, collection) => {
         collection.update(
           { _id : objectId(req.params.id) },
-          { $set : { title : req.body.title } },
+          { $set : { titulo : req.body.titulo } },
           {},
           (err, results) => {
             if (err) {
