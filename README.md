@@ -6,7 +6,7 @@ Projeto desenvolvido durante o Curso de [**Curso Completo do Desenvolvedor NodeJ
 
 ## Requisitos
 
-Para executar o projeto é necessário ter instalado:
+Para executar o projeto é necessário ter instalados:
 * [NodeJS](https://nodejs.org)
 * [MongoDB](https://www.mongodb.com/)
 
@@ -19,7 +19,7 @@ Para executar a api, entre no diretório ***api*** utilizando o terminal e insta
 
 É necessário que a **MongoDB** esteja em execução antes de iniciar a api. Caso haja dúvida, clique no link abaixo:
 
-* [Instalação e configuração MongoDB](https://docs.mongodb.com/manual/tutorial/getting-started/)
+* [Instalação MongoDB](https://docs.mongodb.com/manual/installation/)
 
 Após instalar as dependências e se certificar que o MongoDB está em execução, execute o comando:
 
